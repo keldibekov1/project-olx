@@ -83,6 +83,7 @@ model User {
   otp       String?
   verified  Boolean    @default(false)
   createdAt DateTime   @default(now())
+  role      Role       @default(USER) 
 
   regionId  String?  
   region    Region?    @relation(fields: [regionId], references: [id])
@@ -91,6 +92,10 @@ model User {
   likes     Like[]     
   comments  Comment[]  
   orders    Order[]  
+}
+enum Role {
+  USER
+  ADMIN
 }
 
 model Color {

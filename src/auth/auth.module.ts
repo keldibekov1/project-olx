@@ -4,34 +4,27 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: "secret",
-        signOptions: { expiresIn: '7d' },
-      }),
-      inject: [ConfigService],
+    JwtModule.register({
+      global: true,
+      secret: 'secret',
+      signOptions: { expiresIn: '7d' },
     }),
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        transport: {
-          service: 'gmail',
-          auth: {
-            user: "testotpn16@gmail.com",
-            pass: "quwn ctwb vwvn yuwo",
-          },
+    MailerModule.forRoot({
+      transport: {
+        service: 'gmail',
+        auth: {
+          user: 'testotpn16@gmail.com',
+          pass: 'quwn ctwb vwvn yuwo',
         },
-      }),
-      inject: [ConfigService],
+      },
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, PrismaService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
+

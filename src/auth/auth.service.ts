@@ -14,7 +14,15 @@ export class AuthService {
   ) {}
 
   async sendOtp(email: string) {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+  if (user) {
+    if (user.verified) {
+      throw new BadRequestException('Siz allaqachon ro‘yxatdan o‘tgansiz');
+    }
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
     await this.prisma.user.upsert({
       where: { email },
@@ -77,7 +85,7 @@ export class AuthService {
       throw new UnauthorizedException('Email yoki parol notogri');
     }
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    const token = this.jwtService.sign({ id: user.id, email: user.email, role: user.role });
 
     return { token };
   }

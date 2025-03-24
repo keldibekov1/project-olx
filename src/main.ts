@@ -10,6 +10,7 @@ async function bootstrap() {
     .setDescription('Foydalanuvchilar uchun autentifikatsiya API')
     .setVersion('1.0')
     .addTag('Authentication')
+    .addSecurityRequirements('bearer',["bearer"])
     .addBearerAuth() 
     .build();
 

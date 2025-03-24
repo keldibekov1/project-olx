@@ -1,6 +1,9 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+
 -- CreateTable
 CREATE TABLE "Region" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "Region_pkey" PRIMARY KEY ("id")
@@ -70,7 +73,8 @@ CREATE TABLE "User" (
     "otp" TEXT,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "regionId" INTEGER,
+    "role" "Role" NOT NULL DEFAULT 'USER',
+    "regionId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
