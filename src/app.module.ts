@@ -13,6 +13,8 @@ import { ProductModule } from './product/product.module';
 import { UploadModule } from './upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { LikeModule } from './like/like.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/file'
     }),
+    LikeModule,
+    CommentModule,
     
   ],
   controllers: [AppController],

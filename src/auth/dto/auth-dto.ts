@@ -17,7 +17,7 @@ export class RegisterDto {
   @IsNotEmpty()
   lastname: string;
 
-  @ApiProperty({ example: 1, description: "Foydalanuvchi region ID" })
+  @ApiProperty({ example: "3365cd95-8062-4242-b033-85e4210d146a", description: "Foydalanuvchi region ID" })
   @IsNumber()
   regionId: string;
 

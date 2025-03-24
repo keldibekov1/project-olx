@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ColorService } from './color.service';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('color')
 export class ColorController {
@@ -10,6 +12,7 @@ export class ColorController {
 
   
 @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Yangi color qoshish' })
   @ApiResponse({ status: 201, description: 'color muvaffaqiyatli qoshildi.' })
   @ApiResponse({ status: 409, description: 'Bu color allaqachon mavjud!' })
@@ -33,6 +36,7 @@ export class ColorController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'color ochirish' })
   @ApiResponse({ status: 200, description: 'color muvaffaqiyatli ochirildi.' })
   @ApiResponse({ status: 404, description: 'Bunday color mavjud emas!' })
@@ -41,6 +45,7 @@ export class ColorController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: 'colorni yangilash' })
     @ApiResponse({ status: 200, description: 'color yangilandi' })
     @ApiResponse({ status: 400, description: 'Xatolik: Malumotlar notogri' })

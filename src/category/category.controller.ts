@@ -1,11 +1,14 @@
 import { 
   Controller, Get, Post, Body, Param, Delete, 
-  Patch
+  Patch,
+  UseGuards
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @ApiTags('Category')
 @Controller('category')
@@ -13,6 +16,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Yangi kategoriya qoshish' })
   @ApiResponse({ status: 201, description: 'Kategoriya muvaffaqiyatli qoshildi.' })
   @ApiResponse({ status: 400, description: 'Xatolik: Malumotlar notogri.' })
@@ -37,6 +41,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'ID boyicha kategoriya ochirish' })
   @ApiParam({ name: 'id', example: 'category-uuid-id' })
   @ApiResponse({ status: 200, description: 'Kategoriya muvaffaqiyatli ochirildi.' })
@@ -46,6 +51,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'ID boyicha kategoriya yangilash' })
   @ApiParam({ name: 'id', example: 'category-uuid-id' })
   @ApiResponse({ status: 200, description: 'Kategoriya muvaffaqiyatli yangilandi.' })

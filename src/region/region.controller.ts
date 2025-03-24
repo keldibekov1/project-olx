@@ -4,6 +4,7 @@ import { RegionService } from './region.service';
 import { CreateRegionDto } from './dto/create-region.dto';
 import { UpdateRegionDto } from './dto/update-region.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @ApiTags('Region') 
 @Controller('region')
@@ -11,6 +12,7 @@ export class RegionController {
   constructor(private readonly regionService: RegionService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Yangi region yaratish' })
   @ApiResponse({ status: 201, description: 'Region muvaffaqiyatli yaratildi' })
   @ApiResponse({ status: 400, description: 'Xatolik: Malumotlar notogri' })
@@ -19,7 +21,6 @@ export class RegionController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Barcha regionlarni olish' })
   @ApiResponse({ status: 200, description: 'Barcha regionlar' })
   findAll() {
@@ -35,6 +36,7 @@ export class RegionController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Regionni yangilash' })
   @ApiResponse({ status: 200, description: 'Region yangilandi' })
   @ApiResponse({ status: 400, description: 'Xatolik: Malumotlar notogri' })
@@ -42,9 +44,9 @@ export class RegionController {
   update(@Param('id') id: string, @Body() updateRegionDto: UpdateRegionDto) {
     return this.regionService.update(id, updateRegionDto);
   }
-  
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Regionni ochirish' })
   @ApiResponse({ status: 200, description: 'Region ochirildi' })
   @ApiResponse({ status: 404, description: 'Region topilmadi' })

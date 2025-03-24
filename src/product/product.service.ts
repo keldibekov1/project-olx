@@ -36,7 +36,7 @@ export class ProductService {
 
     const skip = (Number(page) - 1) * Number(limit);
 
-    return await this.prisma.product.findMany({
+    const products = await this.prisma.product.findMany({
         where: {
             categoryId: categoryId || undefined,
             price: {
@@ -49,17 +49,69 @@ export class ProductService {
         },
         skip,
         take: Number(limit),
+        include: {
+            user: {
+                select: {
+                    firstname: true,
+                    lastname: true,
+                    email: true,
+                }
+            },
+            color: {
+                select: {
+                    name: true
+                }
+            },
+            category: {
+              select: {
+                  name: true
+              }
+            },
+            likes: true
+        }
     });
+
+    return products.map(product => ({
+        ...product,
+        totalLikes: product.likes.length
+    }));
 }
 
-  
-  
 
-  async findOne(id: string) {
-    const product = await this.prisma.product.findUnique({ where: { id } });
-    if (!product) throw new NotFoundException('Mahsulot topilmadi');
-    return product;
-  }
+async findOne(id: string) {
+  const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: {
+          user: {
+              select: {
+                  firstname: true,
+                  lastname: true,
+                  email: true,
+              }
+          },
+          color: {
+              select: {
+                  name: true
+              }
+          },
+          category: {
+              select: {
+                  name: true
+              }
+          },
+          likes: true
+      }
+  });
+
+  if (!product) throw new NotFoundException('Mahsulot topilmadi');
+  
+  return {
+      ...product,
+      totalLikes: product.likes.length
+  };
+}
+
+
 
   async update(id: string, dto: UpdateProductDto) {
     return await this.prisma.product.update({

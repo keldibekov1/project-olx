@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { CreateProductDto, UpdateProductDto } from './dto/create-product.dto';
 import { GetProductsDto } from './dto/get-products.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('Mahsulotlar')
 @Controller('products')
@@ -12,6 +13,7 @@ export class ProductController {
 
   @ApiOperation({ summary: 'Yangi mahsulot yaratish' })
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Request() req, @Body() createProductDto: CreateProductDto) {
     const userId = req.user.id; 
     return this.productService.create(userId, createProductDto);
@@ -38,12 +40,14 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Mahsulotni yangilash' })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productService.update(id, dto);
   }
 
-  @ApiOperation({ summary: 'Mahsulotni o‘chirish' })
+  @ApiOperation({ summary: 'Mahsulotni ochirish' })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productService.remove(id);

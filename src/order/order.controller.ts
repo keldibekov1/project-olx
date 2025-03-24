@@ -7,11 +7,11 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('Order')
 @Controller('order')
-@UseGuards(JwtAuthGuard) 
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Yangi buyurtma yaratish' })
   @ApiResponse({ status: 201, description: 'Buyurtma muvaffaqiyatli yaratildi' })
   create(@Request() req, @Body() createOrderDto: CreateOrderDto) {
@@ -32,12 +32,14 @@ export class OrderController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard) 
   @ApiOperation({ summary: 'Buyurtmani yangilash' })
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard) 
   @ApiOperation({ summary: 'Buyurtmani ochirish' })
   remove(@Param('id') id: string) {
     return this.orderService.remove(id);
