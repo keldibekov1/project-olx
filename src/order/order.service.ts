@@ -2,30 +2,56 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private socketGateway: SocketGateway) {}
 
   async create(userId: string, data: CreateOrderDto) {
-    return this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         ...data,
-        userId, 
+        userId,
+      },
+      include: {
+        product: { select: { userId: true } },
       },
     });
+
+    if (order.product.userId) {
+      this.socketGateway.sendNotification(order.product.userId, {
+        message: `Yangi buyurtma tushdi!`,
+        orderId: order.id,
+      });
+    }
+
+    return order;
   }
 
   async findAll() {
     return this.prisma.order.findMany({
-      include: { user: true, product: true, color: true },
+      include: { user: {
+        select: {
+            firstname: true,
+            lastname: true,
+            email: true,
+        }
+    }, product: true, color: true },
     });
   }
 
   async findOne(id: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { user: true, product: true, color: true },
+      include: { user: {
+        select: {
+            firstname: true,
+            lastname: true,
+            email: true,
+        }
+    },      product: true,
+            color: true },
     });
 
     if (!order) throw new NotFoundException('Buyurtma topilmadi!');

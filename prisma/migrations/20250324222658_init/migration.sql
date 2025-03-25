@@ -42,6 +42,7 @@ CREATE TABLE "Like" (
 CREATE TABLE "Comment" (
     "id" TEXT NOT NULL,
     "text" TEXT NOT NULL,
+    "star" DOUBLE PRECISION NOT NULL,
     "userId" TEXT NOT NULL,
     "productId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -54,6 +55,10 @@ CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
+    "img" TEXT NOT NULL,
+    "description" TEXT,
+    "count" INTEGER NOT NULL,
+    "skidka" DOUBLE PRECISION,
     "categoryId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "colorId" TEXT NOT NULL,

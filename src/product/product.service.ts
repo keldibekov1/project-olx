@@ -67,50 +67,82 @@ export class ProductService {
                   name: true
               }
             },
-            likes: true
+            likes: true,
+            comments: {
+               
+            }
+            
         }
     });
 
-    return products.map(product => ({
-        ...product,
-        totalLikes: product.likes.length
-    }));
+    return products.map(product => {
+        const totalStars = product.comments?.reduce((sum, comment) => sum + comment.star, 0) || 0;
+        const avgStars = product.comments?.length ? (totalStars / product.comments.length).toFixed(1) : "0"; 
+        
+        return {
+            ...product,
+            totalLikes: product.likes.length,
+            discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
+            avgStars
+        };
+    });
 }
 
 
 async findOne(id: string) {
-  const product = await this.prisma.product.findUnique({
-      where: { id },
-      include: {
-          user: {
-              select: {
-                  firstname: true,
-                  lastname: true,
-                  email: true,
-              }
-          },
-          color: {
-              select: {
-                  name: true
-              }
-          },
-          category: {
-              select: {
-                  name: true
-              }
-          },
-          likes: true
-      }
-  });
-
-  if (!product) throw new NotFoundException('Mahsulot topilmadi');
+    const product = await this.prisma.product.findUnique({
+        where: { id },
+        include: {
+            user: {
+                select: {
+                    firstname: true,
+                    lastname: true,
+                    email: true,
+                }
+            },
+            color: {
+                select: {
+                    name: true
+                }
+            },
+            category: {
+                select: {
+                    name: true
+                }
+            },
+            likes: true,
+            comments: {
+                select: {
+                    text: true,
+                    star: true,
+                    user: {
+                        select: {
+                            firstname: true,
+                            lastname: true
+                        }
+                    }
+                }
+            }
+        }
+    });
   
-  return {
-      ...product,
-      totalLikes: product.likes.length
-  };
-}
-
+    if (!product) throw new NotFoundException('Mahsulot topilmadi');
+  
+    const totalStars = product.comments?.reduce((sum, comment) => sum + comment.star, 0) || 0;
+    const avgStars = product.comments?.length ? (totalStars / product.comments.length).toFixed(1) : "0";
+  
+    return {
+        ...product,
+        totalLikes: product.likes.length,
+        discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
+        avgStars
+    };
+  }
+  
+  
+  
+  
+  
 
 
   async update(id: string, dto: UpdateProductDto) {

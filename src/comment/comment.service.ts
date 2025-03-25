@@ -10,11 +10,13 @@ export class CommentService {
     return await this.prisma.comment.create({
       data: {
         text: dto.text,
+        star: dto.star, 
         productId: dto.productId,
         userId,
       },
     });
   }
+  
 
   async findAll(productId: string) {
     return await this.prisma.comment.findMany({

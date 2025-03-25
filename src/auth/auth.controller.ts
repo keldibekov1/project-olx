@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, VerifyOtpDto } from './dto/auth-dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { SendOtpDto } from './dto/send-otp.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -39,5 +40,11 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Email yoki parol notogri' })
   async login(@Body() data: LoginDto) {
     return this.authService.login(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  async getProfile(@Request() req) {
+    return this.authService.getProfile(req.user.id);
   }
 }

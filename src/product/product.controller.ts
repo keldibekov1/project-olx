@@ -2,12 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, 
 import { ProductService } from './product.service';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { CreateProductDto, UpdateProductDto } from './dto/create-product.dto';
-import { GetProductsDto } from './dto/get-products.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('Mahsulotlar')
 @Controller('products')
-
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -26,12 +24,12 @@ export class ProductController {
   @ApiQuery({ name: 'sortBy', required: false, example: 'price', description: 'Saralash ustuni (masalan: name, price, createdAt)' })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Saralash tartibi (asc | desc)' })
   @ApiQuery({ name: 'categoryId', required: false, description: 'Kategoriya ID bo‘yicha filter' })
+  @ApiQuery({ name: 'colorId', required: false, description: 'Rang ID bo‘yicha filter' })
   @ApiQuery({ name: 'minPrice', required: false, example: 100, description: 'Minimal narx filtri' })
   @ApiQuery({ name: 'maxPrice', required: false, example: 500, description: 'Maksimal narx filtri' })
-  async getAllProducts(@Query() query: GetProductsDto){
+  async getAllProducts(@Query() query) {
     return this.productService.findAll(query);
   }
-
 
   @ApiOperation({ summary: 'Bitta mahsulot olish' })
   @Get(':id')
@@ -46,7 +44,7 @@ export class ProductController {
     return this.productService.update(id, dto);
   }
 
-  @ApiOperation({ summary: 'Mahsulotni ochirish' })
+  @ApiOperation({ summary: 'Mahsulotni o‘chirish' })
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {

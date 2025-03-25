@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {
-  @ApiProperty({ example: 'Bu juda zor mahsulot!', description: 'Komment matni' })
+  @ApiProperty({ example: 'Bu juda zo‘r mahsulot!', description: 'Komment matni' })
   @IsString()
   @IsNotEmpty()
   text: string;
@@ -11,4 +11,11 @@ export class CreateCommentDto {
   @IsString()
   @IsNotEmpty()
   productId: string;
+
+  @ApiProperty({ example: 4.5, description: 'Mahsulotga berilgan baho (1 dan 5 gacha)' })
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(1)
+  @Max(5)
+  star: number;
 }

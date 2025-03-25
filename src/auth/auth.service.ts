@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -36,7 +36,7 @@ export class AuthService {
       text: `Sizning tasdiqlash kodingiz: ${otp}`,
     });
 
-    return { message: 'OTP yuborildi' };
+    return { message: 'OTP yuborildi', otp };
   }
 
   async verifyOtp(email: string, otp: string) {
@@ -89,4 +89,20 @@ export class AuthService {
 
     return { token };
   }
+
+
+async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, firstname: true, lastname: true, email: true, role: true, img: true },
+    });
+  
+    if (!user) {
+      throw new NotFoundException('Foydalanuvchi topilmadi');
+    }
+  
+    return user;
+  }
+  
 }
+

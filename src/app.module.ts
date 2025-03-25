@@ -15,6 +15,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
+import { SocketGateway } from './socket/socket.gateway';
 
 @Module({
   imports: [
@@ -35,6 +36,8 @@ import { CommentModule } from './comment/comment.module';
     
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,SocketGateway],
+  exports: [SocketGateway], // Boshqa xizmatlar foydalanishi uchun
+
 })
 export class AppModule {}
