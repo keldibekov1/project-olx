@@ -18,7 +18,7 @@ export class OrderService {
         product: { select: { userId: true } },
       },
     });
-
+    
     if (order.product.userId) {
       this.socketGateway.sendNotification(order.product.userId, {
         message: `Yangi buyurtma tushdi!`,
@@ -28,7 +28,26 @@ export class OrderService {
 
     return order;
   }
-
+  async myOrders(userId: string) {
+    const orders = await this.prisma.order.findMany({
+      where: { userId },
+      include: { 
+        user: {
+          select: {
+            firstname: true,
+            lastname: true,
+            email: true,
+          }
+        },
+        product: true,
+        color: true
+      },
+    });
+  
+    
+    return orders;
+  }
+  
   async findAll() {
     return this.prisma.order.findMany({
       include: { user: {
@@ -40,6 +59,8 @@ export class OrderService {
     }, product: true, color: true },
     });
   }
+
+  
 
   async findOne(id: string) {
     const order = await this.prisma.order.findUnique({

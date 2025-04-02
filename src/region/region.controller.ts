@@ -12,7 +12,7 @@ export class RegionController {
   constructor(private readonly regionService: RegionService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Yangi region yaratish' })
   @ApiResponse({ status: 201, description: 'Region muvaffaqiyatli yaratildi' })
   @ApiResponse({ status: 400, description: 'Xatolik: Malumotlar notogri' })

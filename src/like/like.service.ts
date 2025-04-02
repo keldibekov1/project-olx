@@ -44,4 +44,18 @@ export class LikeService {
   async remove(id: string) {
     return await this.prisma.like.delete({ where: { id } });
   }
+
+
+  async myLikes(userId: string) {
+    const likes = await this.prisma.like.findMany({
+      where: { userId },
+      include: {
+        product: {
+          select: { name: true, price: true , img: true, description: true, color: true},
+        },
+      },
+    });
+    return likes; 
+  }
+  
 }

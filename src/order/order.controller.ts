@@ -18,12 +18,23 @@ export class OrderController {
     const userId = req.user.id; 
     return this.orderService.create(userId, createOrderDto);
   }
+  @Get('myorders')
+  @UseGuards(JwtAuthGuard) 
+  @ApiOperation({ summary: 'Foydalanuvchining barcha buyurtmalarini olish' })
+  @ApiResponse({ status: 200, description: 'Foydalanuvchining buyurtmalari muvaffaqiyatli qaytarildi' })
+  @ApiResponse({ status: 404, description: 'Foydalanuvchining buyurtmalari topilmadi' })
+  async getMyOrders(@Request() req) {
+    return this.orderService.myOrders(req.user.id);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Barcha buyurtmalarni olish' })
   findAll() {
     return this.orderService.findAll();
   }
+
+
+
 
   @Get(':id')
   @ApiOperation({ summary: 'ID boyicha buyurtmani olish' })

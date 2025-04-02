@@ -88,6 +88,43 @@ export class ProductService {
     });
 }
 
+async myProducts(userId: string, page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+
+    const products = await this.prisma.product.findMany({
+        where: { userId },
+        include: {
+            category: { select: { name: true } },
+            color: { select: { name: true } },
+            likes: true,
+            comments: { select: { star: true } }
+        },
+        skip: offset,
+        take: limit
+    });
+
+    const totalCount = await this.prisma.product.count({ where: { userId } });
+
+    const formattedProducts = products.map(product => {
+        const totalStars = product.comments?.reduce((sum, comment) => sum + comment.star, 0) || 0;
+        const avgStars = product.comments?.length ? (totalStars / product.comments.length).toFixed(1) : "0";
+
+        return {
+            ...product,
+            totalLikes: product.likes.length,
+            discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
+            avgStars
+        };
+    });
+
+    return {
+        data: formattedProducts,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalItems: totalCount
+    };
+}
+
 
 async findOne(id: string) {
     const product = await this.prisma.product.findUnique({

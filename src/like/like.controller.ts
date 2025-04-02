@@ -16,13 +16,19 @@ export class LikeController {
   create(@Request() req, @Body() dto: CreateLikeDto) {
     return this.likeService.create(req.user.id, dto);
   }
-
+  
   @Get()
   @ApiOperation({ summary: 'Barcha like-larni olish' })
   findAll() {
     return this.likeService.findAll();
   }
-
+  
+    @Get('mylikes')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Mening like-larimni olish' })
+  async myLikes(@Request() req) {
+    return this.likeService.myLikes(req.user.id);
+  }
   @Get(':id')
   @ApiOperation({ summary: 'Bitta like-ni olish' })
   findOne(@Param('id') id: string) {
@@ -35,4 +41,6 @@ export class LikeController {
   remove(@Param('id') id: string) {
     return this.likeService.remove(id);
   }
+
+
 }

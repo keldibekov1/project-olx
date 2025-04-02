@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({ example: 'user@example.com', description: 'Foydalanuvchi email manzili' })
@@ -18,7 +18,7 @@ export class RegisterDto {
   lastname: string;
 
   @ApiProperty({ example: "3365cd95-8062-4242-b033-85e4210d146a", description: "Foydalanuvchi region ID" })
-  @IsNumber()
+  @IsUUID()
   regionId: string;
 
   @ApiProperty({ example: '12345678', description: 'Parol kamida 6 ta belgi bolishi kerak' })
@@ -32,6 +32,7 @@ export class RegisterDto {
   @IsNotEmpty()
   img: string;
 }
+
 
 export class LoginDto {
   @ApiProperty({ example: 'user@example.com', description: 'Foydalanuvchi email manzili' })

@@ -16,6 +16,8 @@ import { join } from 'path';
 import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
 import { SocketGateway } from './socket/socket.gateway';
+import { MessageModule } from './message/message.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -33,11 +35,13 @@ import { SocketGateway } from './socket/socket.gateway';
     }),
     LikeModule,
     CommentModule,
+    MessageModule,
+    UserModule,
     
   ],
   controllers: [AppController],
   providers: [AppService,SocketGateway],
-  exports: [SocketGateway], // Boshqa xizmatlar foydalanishi uchun
+  exports: [SocketGateway], 
 
 })
 export class AppModule {}

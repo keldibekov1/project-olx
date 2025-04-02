@@ -23,13 +23,29 @@ export class ProductController {
   @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Nechta mahsulot olish (default: 10)' })
   @ApiQuery({ name: 'sortBy', required: false, example: 'price', description: 'Saralash ustuni (masalan: name, price, createdAt)' })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Saralash tartibi (asc | desc)' })
-  @ApiQuery({ name: 'categoryId', required: false, description: 'Kategoriya ID bo‘yicha filter' })
-  @ApiQuery({ name: 'colorId', required: false, description: 'Rang ID bo‘yicha filter' })
+  @ApiQuery({ name: 'categoryId', required: false, description: 'Kategoriya ID boyicha filter' })
+  @ApiQuery({ name: 'colorId', required: false, description: 'Rang ID bo yicha filter' })
   @ApiQuery({ name: 'minPrice', required: false, example: 100, description: 'Minimal narx filtri' })
   @ApiQuery({ name: 'maxPrice', required: false, example: 500, description: 'Maksimal narx filtri' })
   async getAllProducts(@Query() query) {
     return this.productService.findAll(query);
   }
+
+
+  @Get('myproducts')
+@UseGuards(JwtAuthGuard)
+@ApiOperation({ summary: 'Mening mahsulotlarimni olish' })
+@ApiQuery({ name: 'page', required: false, example: 1, description: 'Qaysi sahifa (default: 1)' })
+@ApiQuery({ name: 'limit', required: false, example: 10, description: 'Nechta mahsulot olish (default: 10)' })
+async myProducts(
+  @Request() req,
+  @Query('page') page: number = 1,
+  @Query('limit') limit: number = 10
+) {
+  return this.productService.myProducts(req.user.id, Number(page), Number(limit));
+}
+
+  
 
   @ApiOperation({ summary: 'Bitta mahsulot olish' })
   @Get(':id')
@@ -44,7 +60,7 @@ export class ProductController {
     return this.productService.update(id, dto);
   }
 
-  @ApiOperation({ summary: 'Mahsulotni o‘chirish' })
+  @ApiOperation({ summary: 'Mahsulotni ochirish' })
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {

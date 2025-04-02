@@ -12,8 +12,6 @@ import { diskStorage } from 'multer';
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  constructor() {}
-
   @ApiOperation({ summary: 'Fayl yuklash' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -34,12 +32,13 @@ export class UploadController {
     storage: diskStorage({
       destination: './uploads',
       filename(req, file, cb) {
-        const name = `${Date.now()}${path.extname(file.originalname)}`;
-        cb(null, name);
+        const fileName = `${Date.now()}${path.extname(file.originalname)}`;
+        cb(null, fileName);
       },
     }),
   }))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return { file };
+    const fileUrl = `https://keldibekov.online/uploads/${file.filename}`;
+    return { fileUrl };
   }
 }
