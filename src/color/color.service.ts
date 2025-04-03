@@ -19,12 +19,31 @@ export class ColorService {
     return this.prisma.color.create({ data });
   }
 
-  async findAll() {
-    return this.prisma.color.findMany();
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [colors, total] = await this.prisma.$transaction([
+      this.prisma.color.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.color.count(),
+    ]);
+
+    return {
+      data: colors,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string) {
-    return this.prisma.color.findUnique({ where: { id } });
+    const color = await this.prisma.color.findUnique({ where: { id } });
+    if (!color) {
+      throw new NotFoundException(`Bunday rang mavjud emas!`);
+    }
+    return color;
   }
 
   async remove(id: string) {
@@ -39,11 +58,11 @@ export class ColorService {
     return this.prisma.color.delete({ where: { id } });
   }
 
-  async update(id: string, UpdateTypeDto: UpdateColorDto) {
+  async update(id: string, updateColorDto: UpdateColorDto) {
     return await this.prisma.color.update({
       where: { id },
       data: {
-        name: UpdateTypeDto.name ?? undefined, 
+        name: updateColorDto.name ?? undefined, 
       },
     });
   }

@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { ColorService } from './color.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -21,10 +21,12 @@ export class ColorController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Barcha colorni olish' })
-  @ApiResponse({ status: 200, description: 'Barcha color royxati' })
-  findAll() {
-    return this.colorService.findAll();
+  @ApiOperation({ summary: 'Barcha ranglarni olish (pagination bilan)' })
+  @ApiResponse({ status: 200, description: 'Barcha ranglar royxati' })
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Sahifadagi elementlar soni (default: 10)' })
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.colorService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')

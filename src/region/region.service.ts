@@ -23,8 +23,20 @@ export class RegionService {
 
   
 
-  async findAll() {
-    return await this.prisma.region.findMany();
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const regions = await this.prisma.region.findMany({
+      skip,
+      take: limit,
+    });
+
+    const total = await this.prisma.region.count();
+    return {
+      data: regions,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalRegions: total,
+    };
   }
 
   async findOne(id: string) {

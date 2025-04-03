@@ -28,7 +28,8 @@ export class OrderService {
 
     return order;
   }
-  async myOrders(userId: string) {
+  async myOrders(userId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
     const orders = await this.prisma.order.findMany({
       where: { userId },
       include: { 
@@ -42,22 +43,48 @@ export class OrderService {
         product: true,
         color: true
       },
+      skip,
+      take: limit,
     });
-  
-    
-    return orders;
+
+    const total = await this.prisma.order.count({ where: { userId } });
+
+    return {
+      data: orders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
   
-  async findAll() {
-    return this.prisma.order.findMany({
-      include: { user: {
-        select: {
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const orders = await this.prisma.order.findMany({
+      include: { 
+        user: {
+          select: {
             firstname: true,
             lastname: true,
             email: true,
-        }
-    }, product: true, color: true },
+          }
+        }, 
+        product: true, 
+        color: true 
+      },
+      skip,
+      take: limit,
     });
+
+    const total = await this.prisma.order.count();
+
+    return {
+      data: orders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   

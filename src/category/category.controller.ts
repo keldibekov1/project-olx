@@ -1,9 +1,10 @@
 import { 
   Controller, Get, Post, Body, Param, Delete, 
   Patch,
-  UseGuards
+  UseGuards,
+  Query
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -25,10 +26,12 @@ export class CategoryController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Barcha kategoriyalarni olish' })
+  @ApiOperation({ summary: 'Barcha kategoriyalarni olish (pagination bilan)' })
   @ApiResponse({ status: 200, description: 'Barcha kategoriyalar listi.' })
-  findAll() {
-    return this.categoryService.findAll();
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Sahifadagi elementlar soni (default: 10)' })
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.categoryService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')

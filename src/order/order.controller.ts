@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -23,14 +23,22 @@ export class OrderController {
   @ApiOperation({ summary: 'Foydalanuvchining barcha buyurtmalarini olish' })
   @ApiResponse({ status: 200, description: 'Foydalanuvchining buyurtmalari muvaffaqiyatli qaytarildi' })
   @ApiResponse({ status: 404, description: 'Foydalanuvchining buyurtmalari topilmadi' })
-  async getMyOrders(@Request() req) {
-    return this.orderService.myOrders(req.user.id);
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Sahifadagi elementlar soni (default: 10)' })
+  async getMyOrders(
+    @Request() req, 
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 10
+  ) {
+    return this.orderService.myOrders(req.user.id, Number(page), Number(limit));
   }
 
   @Get()
   @ApiOperation({ summary: 'Barcha buyurtmalarni olish' })
-  findAll() {
-    return this.orderService.findAll();
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Sahifadagi elementlar soni (default: 10)' })
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.orderService.findAll(Number(page), Number(limit));
   }
 
 

@@ -24,10 +24,21 @@ export class CategoryService {
     return this.prisma.category.create({ data });
   }
 
-  async findAll() {
-    return this.prisma.category.findMany({
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const categories = await this.prisma.category.findMany({
+      skip,
+      take: limit,
       include: { type: true, products: true },
     });
+
+    const total = await this.prisma.category.count();
+    return {
+      data: categories,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalCategories: total,
+    };
   }
 
   async findOne(id: string) {

@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RegionService } from './region.service';
 import { CreateRegionDto } from './dto/create-region.dto';
 import { UpdateRegionDto } from './dto/update-region.dto';
@@ -21,10 +21,12 @@ export class RegionController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Barcha regionlarni olish' })
+  @ApiOperation({ summary: 'Barcha regionlarni olish (pagination bilan)' })
   @ApiResponse({ status: 200, description: 'Barcha regionlar' })
-  findAll() {
-    return this.regionService.findAll();
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Sahifa raqami (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Sahifadagi elementlar soni (default: 10)' })
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.regionService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')
