@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Query } from '@nestjs/common';
+import { 
+  Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Query 
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { CreateProductDto, UpdateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { SetMetadata } from '@nestjs/common';
+import { OwnerGuard } from 'src/guards/owner.guard';
 
 @ApiTags('Mahsulotlar')
 @Controller('products')
@@ -31,21 +35,18 @@ export class ProductController {
     return this.productService.findAll(query);
   }
 
-
   @Get('myproducts')
-@UseGuards(JwtAuthGuard)
-@ApiOperation({ summary: 'Mening mahsulotlarimni olish' })
-@ApiQuery({ name: 'page', required: false, example: 1, description: 'Qaysi sahifa (default: 1)' })
-@ApiQuery({ name: 'limit', required: false, example: 10, description: 'Nechta mahsulot olish (default: 10)' })
-async myProducts(
-  @Request() req,
-  @Query('page') page: number = 1,
-  @Query('limit') limit: number = 10
-) {
-  return this.productService.myProducts(req.user.id, Number(page), Number(limit));
-}
-
-  
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Mening mahsulotlarimni olish' })
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Qaysi sahifa (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Nechta mahsulot olish (default: 10)' })
+  async myProducts(
+    @Request() req,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+    return this.productService.myProducts(req.user.id, Number(page), Number(limit));
+  }
 
   @ApiOperation({ summary: 'Bitta mahsulot olish' })
   @Get(':id')
@@ -54,15 +55,17 @@ async myProducts(
   }
 
   @ApiOperation({ summary: 'Mahsulotni yangilash' })
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
+  @SetMetadata('model', 'product')
+  @UseGuards(JwtAuthGuard, OwnerGuard)
   update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productService.update(id, dto);
   }
 
   @ApiOperation({ summary: 'Mahsulotni ochirish' })
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @SetMetadata('model', 'product')
+  @UseGuards(JwtAuthGuard, OwnerGuard)
   remove(@Param('id') id: string) {
     return this.productService.remove(id);
   }

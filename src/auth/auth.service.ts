@@ -18,7 +18,7 @@ export class AuthService {
 
   if (user) {
     if (user.verified) {
-      throw new BadRequestException('Siz allaqachon royxatdan o‘tgansiz');
+      throw new BadRequestException('Siz allaqachon royxatdan otgansiz');
     }
   }
 

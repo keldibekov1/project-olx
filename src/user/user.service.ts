@@ -10,8 +10,18 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateUserDto): Promise<User> {
+    if (data.regionId) {
+      const regionExists = await this.prisma.region.findUnique({
+        where: { id: data.regionId },
+      });
+  
+      if (!regionExists) {
+        throw new NotFoundException('Bunday region mavjud emas');
+      }
+    }
+  
     const hashedPassword = await bcrypt.hash(data.password, 10);
-
+  
     return this.prisma.user.create({
       data: {
         email: data.email,
@@ -20,10 +30,11 @@ export class UserService {
         lastname: data.lastname,
         img: data.img,
         verified: true,
-        regionId: data.regionId,
+        regionId: data.regionId || null, 
       },
     });
   }
+  
 
   async findAll(page: number = 1, limit: number = 10) {
     page = Math.max(1, page);  
