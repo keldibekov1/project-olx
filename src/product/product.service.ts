@@ -7,13 +7,19 @@ export class ProductService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateProductDto) {
+    const { colorIds, ...productData } = dto;  
+  
     return await this.prisma.product.create({
       data: {
-        ...dto,
-        userId, 
+        ...productData,      
+        userId,              
+        colors: {
+          connect: colorIds.map((id) => ({ id })), 
+        },
       },
     });
   }
+  
 
   async findAll(query: { 
     page?: number; 
@@ -21,81 +27,84 @@ export class ProductService {
     sortBy?: string; 
     order?: 'asc' | 'desc'; 
     categoryId?: string; 
+    colorIds?: string[];  
     minPrice?: string | number; 
     maxPrice?: string | number;
-}) {
+  }) {
     const { 
-        page = 1, 
-        limit = 10, 
-        sortBy = 'createdAt', 
-        order = 'desc', 
-        categoryId, 
-        minPrice, 
-        maxPrice 
+      page = 1, 
+      limit = 10, 
+      sortBy = 'createdAt', 
+      order = 'desc', 
+      categoryId,
+      colorIds,  
+      minPrice, 
+      maxPrice 
     } = query;
-
+  
     const skip = (Number(page) - 1) * Number(limit);
-
+  
     const products = await this.prisma.product.findMany({
-        where: {
-            categoryId: categoryId || undefined,
-            price: {
-                gte: minPrice ? Number(minPrice) : undefined, 
-                lte: maxPrice ? Number(maxPrice) : undefined, 
-            },
+      where: {
+        categoryId: categoryId || undefined,
+        colors: colorIds ? { some: { id: { in: colorIds } } } : undefined, 
+        price: {
+          gte: minPrice ? Number(minPrice) : undefined, 
+          lte: maxPrice ? Number(maxPrice) : undefined, 
         },
-        orderBy: {
-            [sortBy]: order,
+      },
+      orderBy: {
+        [sortBy]: order,
+      },
+      skip,
+      take: Number(limit),
+      include: {
+        user: {
+          select: {
+            firstname: true,
+            lastname: true,
+            email: true,
+          }
         },
-        skip,
-        take: Number(limit),
-        include: {
-            user: {
-                select: {
-                    firstname: true,
-                    lastname: true,
-                    email: true,
-                }
-            },
-            color: {
-                select: {
-                    name: true
-                }
-            },
-            category: {
-              select: {
-                  name: true
-              }
-            },
-            likes: true,
-            comments: {
-               
-            }
-            
-        }
+        colors: {  
+          select: {
+            name: true
+          }
+        },
+        category: {
+          select: {
+              name: true
+          }
+        },
+        likes: true,
+        comments: true
+      }
     });
-
+  
     return products.map(product => {
-        const totalStars = product.comments?.reduce((sum, comment) => sum + comment.star, 0) || 0;
-        const avgStars = product.comments?.length ? (totalStars / product.comments.length).toFixed(1) : "0"; 
-        
-        return {
-            ...product,
-            totalLikes: product.likes.length,
-            discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
-            avgStars
-        };
+      const totalStars = product.comments?.reduce((sum, comment) => sum + comment.star, 0) || 0;
+      const avgStars = product.comments?.length ? (totalStars / product.comments.length).toFixed(1) : "0"; 
+  
+      return {
+        ...product,
+        totalLikes: product.likes.length,
+        discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
+        avgStars
+      };
     });
-}
+  }
+  
+  
 
-async myProducts(userId: string, page: number = 1, limit: number = 10) {
+
+  async myProducts(userId: string, page: number = 1, limit: number = 10) {
     const offset = (page - 1) * limit;
 
     const products = await this.prisma.product.findMany({
         where: { userId },
         include: {
             category: { select: { name: true } },
-            color: { select: { name: true } },
+            colors: { select: { name: true } }, 
             likes: true,
             comments: { select: { star: true } }
         },
@@ -126,6 +135,7 @@ async myProducts(userId: string, page: number = 1, limit: number = 10) {
 }
 
 
+
 async findOne(id: string) {
     const product = await this.prisma.product.findUnique({
         where: { id },
@@ -137,7 +147,7 @@ async findOne(id: string) {
                     email: true,
                 }
             },
-            color: {
+            colors: {  
                 select: {
                     name: true
                 }
@@ -174,7 +184,8 @@ async findOne(id: string) {
         discountedPrice: product.skidka ? product.price * (1 - product.skidka / 100) : product.price,
         avgStars
     };
-  }
+}
+
   
   
   

@@ -12,6 +12,8 @@ export class OwnerGuard implements CanActivate {
     const user = request['user']; 
     if (!user) throw new ForbiddenException('Foydalanuvchi topilmadi');
 
+    if (user.role === 'ADMIN') return true;
+
     const { params } = request;
     const resourceId = params.id; 
     if (!resourceId) throw new ForbiddenException('ID topilmadi');
@@ -23,10 +25,10 @@ export class OwnerGuard implements CanActivate {
       where: { id: resourceId },
     });
 
-    if (!resource) throw new ForbiddenException('Malumot topilmadi');
+    if (!resource) throw new ForbiddenException('Ma\'lumot topilmadi');
 
     if (resource.userId !== user.id) {
-      throw new ForbiddenException("Sizga bu ma'lumot tegishli emas tahrirlash yoki ochirish huquqiga ega emassiz");
+      throw new ForbiddenException("Sizga bu ma'lumot tegishli emas, tahrirlash yoki o‘chirish huquqiga ega emassiz");
     }
 
     return true;

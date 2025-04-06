@@ -22,8 +22,8 @@ export class CreateProductDto {
   @ApiProperty({ example: 'category-uuid', description: 'Kategoriya ID' })
   categoryId: string;
 
-  @ApiProperty({ example: 'color-uuid', description: 'Color ID' })
-  colorId: string;
+  @ApiProperty({ example: ['color-uuid1', 'color-uuid2'], description: 'Ranglar IDlari' })
+  colorIds: string[]; 
 }
 
 export class UpdateProductDto {

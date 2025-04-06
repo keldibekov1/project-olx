@@ -51,7 +51,7 @@ export class LikeService {
       where: { userId },
       include: {
         product: {
-          select: { name: true, price: true , img: true, description: true, color: true},
+          select: { name: true, price: true , img: true, description: true, colors: true},
         },
       },
     });
